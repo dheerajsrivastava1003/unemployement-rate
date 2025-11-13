@@ -1,0 +1,64 @@
+# Import necessary libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+# Replace 'unemployment_data.csv' with your dataset file
+data = pd.read_csv('/Unemployment in India.csv')
+
+# Display first few rows
+print("📄 Sample Data:")
+print(data.head())
+
+# Check basic info
+print("\n📊 Dataset Info:")
+print(data.info())
+
+# Check for missing values
+print("\n❓ Missing Values:")
+print(data.isnull().sum())
+
+# Rename columns for easier access (if needed)
+data.columns = data.columns.str.strip().str.lower().str.replace(' ', '_')
+
+# Example expected columns: ['region', 'date', 'unemployment_rate']
+# Convert date column to datetime
+if 'date' in data.columns:
+    data['date'] = pd.to_datetime(data['date'], format='mixed', dayfirst=True, errors='coerce')
+
+# Basic statistics
+print("\n📈 Summary Statistics:")
+print(data.describe())
+
+# Average unemployment rate by region
+if 'region' in data.columns:
+    avg_rate = data.groupby('region')['estimated_unemployment_rate_(%)'].mean().sort_values(ascending=False)
+    print("\n🏙️ Average Unemployment Rate by Region:")
+    print(avg_rate)
+
+    # Visualization: Average rate by region
+    plt.figure(figsize=(10,5))
+    sns.barplot(x=avg_rate.index, y=avg_rate.values, palette="coolwarm")
+    plt.title("Average Unemployment Rate by Region")
+    plt.xlabel("Region")
+    plt.ylabel("Unemployment Rate (%)")
+    plt.xticks(rotation=45)
+    plt.show()
+
+# Time series analysis
+if 'date' in data.columns:
+    plt.figure(figsize=(12,6))
+    sns.lineplot(x='date', y='estimated_unemployment_rate_(%)', data=data, color='blue')
+    plt.title("Unemployment Rate Over Time (COVID-19 Period)")
+    plt.xlabel("Date")
+    plt.ylabel("Unemployment Rate (%)")
+    plt.show()
+
+# Correlation heatmap (if numerical columns exist)
+plt.figure(figsize=(6,4))
+sns.heatmap(data.corr(numeric_only=True), annot=True, cmap='Blues')
+plt.title("Correlation Between Numerical Features")
+plt.show()
+
+print("\n✅ Data Analysis Completed Successfully!")
